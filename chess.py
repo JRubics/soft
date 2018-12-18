@@ -15,21 +15,21 @@ def main():
   for filename in os.listdir('images'):
     print filename
     # if filename != "other":
-    if filename == "chess107.png":
+    if filename == "chess105.png":
       if photo is 1:
         image_color = load_image('images/' + filename)
-        image_color = dilate(erode(image_color, iterations=1))
+        image_color = erode(dilate(image_color, 2), 2)
         img = image_bin(image_gray(image_color))
-        # display_image(img)
         image_color = rotate_chessboard1(img)
         selected_regions, regions = select_outer_figures(image_color.copy())
+        print(len(regions))
         display_image(selected_regions)
       else:
         image_color = load_image('images/' + filename)
         image_color = dilate(erode(image_color, iterations=1))
         image_color = rotate_chessboard1(image_color)
         selected_regions, regions = select_outer_figures(image_color.copy())
-        display_image(selected_regions)
+        # display_image(selected_regions)
         print(len(regions))
         # for region in regions:
         #   display_image(region)
