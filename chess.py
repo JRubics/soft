@@ -7,49 +7,40 @@ import os
 import random
 
 imgsize = 40
+photo = 1
 
 
-# rotacija radi ok osim za 33 sliku, pokusati ispraviti to i onda gledati kako da se cropuje slika!
 def main():
   # 71 68 54
   for filename in os.listdir('images'):
     print filename
-    if filename != "other":
-    # if filename == "chess43.png":
-      image_color = load_image('images/' + filename)
-      display_image(image_color)
-      # image_color = erode(image_color, iterations=1)
-      # image_color = rotate_chessboard(image_color)
-      img = canny(image_color)
-      # display_image(img)
-      # image1 = find_board(image_color.copy(), img)
-      image1 = rotate_chessboard1(image_color)
-      # display_image(image1)
-      # print(board_box)
-      img = invert(image_bin(image_gray(image1)))
-      # img = canny(image1)
-      selected_regions, numbers = select_outer_figures(image1.copy(), img)
-      display_image(selected_regions)
-    # for region in regions:
-    #   display_image(region)
+    # if filename != "other":
+    if filename == "chess107.png":
+      if photo is 1:
+        image_color = load_image('images/' + filename)
+        image_color = dilate(erode(image_color, iterations=1))
+        img = image_bin(image_gray(image_color))
+        # display_image(img)
+        image_color = rotate_chessboard1(img)
+        selected_regions, regions = select_outer_figures(image_color.copy())
+        display_image(selected_regions)
+      else:
+        image_color = load_image('images/' + filename)
+        image_color = dilate(erode(image_color, iterations=1))
+        image_color = rotate_chessboard1(image_color)
+        selected_regions, regions = select_outer_figures(image_color.copy())
+        display_image(selected_regions)
+        print(len(regions))
+        # for region in regions:
+        #   display_image(region)
 
-# def crop_chessboard(image):
-#   # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-#   # _, thresh = cv2.threshold(gray, 1, 255, cv2.THRESH_BINARY)
-#   # img, contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-#   # cnt = contours[0]
-#   # x, y, w, h = cv2.boundingRect(cnt)
-#   # crop = img[y:y + h, x:x + w]
-#   # return crop
-#   blurred = cv2.GaussianBlur(image_gray(image), (5, 5), 0)
-#   thresh = cv2.threshold(blurred, 0, 127, cv2.THRESH_BINARY)[1]
-#   # thresh = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
-#   bin_img = image_bin(image_gray(image))
-#   img, contours, hierarchy = cv2.findContours(bin_img.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-#   x, y, w, h = cv2.boundingRect(contours[0])
-#   cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-#   image = image[y:y + h, x:x + w]
-#   return image
+
+def change_contrast(img, level):
+  factor = (259 * (level + 255)) / (255 * (259 - level))
+
+  def contrast(c):
+      return 128 + factor * (c - 128)
+  return img.point(contrast)
 
 
 def background(image):
@@ -93,12 +84,13 @@ def rotate_chessboard(image):
 
 
 def rotate_chessboard1(image):
-  img = canny(image)
+  if photo is 1:
+    img = canny_gray(image)
+  else:
+    img = canny(image)
+
   box = find_board(image.copy(), img)
-  # point1 = box[0]
-  # point2 = box[1]
-  # point3 = box[2]
-  # point4 = box[3]
+
   point1 = min(box, key=lambda(b): b[0])
   point2 = max(box, key=lambda(b): b[0])
   point3 = min(box, key=lambda(b): b[1])
@@ -125,22 +117,11 @@ def rotate_chessboard1(image):
   return image
 
 
-def rotate1(point, angle, origin):
-    ox = origin[0]
-    oy = origin[1]
-    px = point[0]
-    py = point[1]
-
-    qx = ox + math.cos(angle) * (px - ox) - math.sin(angle) * (py - oy)
-    qy = oy + math.sin(angle) * (px - ox) + math.cos(angle) * (py - oy)
-    return int(qx), int(qy)
-
-
 def crop_image(point1, point2, point3, point4, image):
-  x_min = min(point1[0], point2[0], point3[0], point4[0])
-  x_max = max(point1[0], point2[0], point3[0], point4[0])
-  y_min = min(point1[1], point2[1], point3[1], point4[1])
-  y_max = max(point1[1], point2[1], point3[1], point4[1])
+  x_min = min(point1[0], point2[0], point3[0], point4[0]) + 3
+  x_max = max(point1[0], point2[0], point3[0], point4[0]) - 3
+  y_min = min(point1[1], point2[1], point3[1], point4[1]) + 3
+  y_max = max(point1[1], point2[1], point3[1], point4[1]) - 3
   image = image[y_min:y_max, x_min:x_max]  # obrnute coord -.-'
   return image
 
@@ -168,6 +149,11 @@ def cross_points(lines, image):
 def canny(image):
   gray = image_gray(image)
   edges = cv2.Canny(gray, 100, 300, apertureSize=7)
+  return dilate(edges)
+
+
+def canny_gray(image):
+  edges = cv2.Canny(image, 100, 300, apertureSize=7)
   return dilate(edges)
 
 
@@ -214,8 +200,18 @@ def line_intersection(line1, line2, image):
     return None
 
 
-def select_outer_figures(image_orig, image_bin):
-  img, contours, hierarchy = cv2.findContours(image_bin.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+def select_outer_figures(image):
+  if photo is 1:
+    img_bin = dilate(erode(image,2))
+  else:
+    img_bin = invert(dilate(erode(image_bin(image_gray(image)), 2)))
+  # img_bin = invert(image_bin(image_gray(image)))
+  # display_image(img_bin)
+  
+  shape = image.shape
+  field_len = int(shape[0] / 8)
+
+  img, contours, hierarchy = cv2.findContours(img_bin.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
   regions_array = []
   hierarchy = hierarchy[0]
   for component in zip(contours, hierarchy):
@@ -224,14 +220,14 @@ def select_outer_figures(image_orig, image_bin):
     if hierarchy[3] == -1:  # izdvoji samo skroz spoljne konture
       x, y, w, h = cv2.boundingRect(contour)
       area = cv2.contourArea(contour)
-      if area > 100 and h < 100 and h > 15 and w > 20:
-        region = image_bin[y:y + h + 1, x:x + w + 1]
+      if area > 100 and h < field_len and h > field_len / 2 and w > field_len / 3:
+        region = img_bin[y:y + h + 1, x:x + w + 1]
         regions_array.append([resize_region(region), (x, y, w, h)])
-        cv2.rectangle(image_orig, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
   regions_array = sorted(regions_array, key=lambda item: item[1][0])
   sorted_regions = [r[0] for r in regions_array]
-  print "asddff"
-  return image_orig, sorted_regions
+  # display_image(image)
+  return image, sorted_regions
 
 
 def find_board(image_orig, image_bin):
@@ -261,8 +257,11 @@ def image_gray(image):
 
 def image_bin(image_gs):
   height, width = image_gs.shape[0:2]
-  image_binary = np.ndarray((height, width), dtype=np.uint8)
-  ret, image_bin = cv2.threshold(image_gs, 120, 255, cv2.THRESH_BINARY)
+  # image_binary = np.ndarray((height, width), dtype=np.uint8)
+  if photo is 1:
+    image_bin = cv2.adaptiveThreshold(image_gs, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+  else:
+    ret, image_bin = cv2.threshold(image_gs, 120, 255, cv2.THRESH_BINARY)
   return image_bin
 
 
