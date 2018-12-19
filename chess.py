@@ -20,7 +20,7 @@ find_alpha = 0
 def main(train):
   # 71 68 54
   for filename in os.listdir('images'):
-    # if filename != "other" and filename != "phone" and filename != "computer":
+    # if filename != "other" and filename != "phone" and filename != "computer" and filename != "train":
     if filename == "chess65.png":
       print filename
       if photo is 1:
@@ -32,38 +32,15 @@ def main(train):
         # print(len(regions))
         # display_image(selected_regions)
       else:
-        figures, alphabet = create_alphabet()
-        if train == "train":
-          inputs = prepare_for_ann(figures)
-          outputs = convert_output(alphabet)
-          ann = create_ann()
-          ann = train_ann(ann, inputs, outputs)
-
-          model_json = ann.to_json()
-          with open("model.json", "w") as json_file:
-              json_file.write(model_json)
-          ann.save_weights("model.h5")
-          print("Saved model to disk")
-
         image_color = load_image('images/' + filename)
         image_color = dilate(erode(image_color, iterations=1))
         image_color = rotate_chessboard1(image_color, image_color)
         # display_image(image_color)
         selected_regions, regions = select_outer_figures(image_color.copy())
-        if train == "no":
-          json_file = open('model.json', 'r')
-          loaded_model_json = json_file.read()
-          json_file.close()
-          ann = model_from_json(loaded_model_json)
-          ann.load_weights("model.h5")
-          print("Loaded model from disk")
 
-        input_regions = prepare_for_ann(regions)
-        result = ann.predict(np.array(input_regions[0:-1], np.float32))
-        # print(result)
-        print(display_result(result, alphabet))
+        network(train, regions)
 
-        # display_image(selected_regions)
+        display_image(selected_regions)
         # print(len(regions))
         # for region in regions:
         #   display_image(region)
@@ -76,25 +53,25 @@ def create_alphabet():
   figures = []
   alphabet = []
 
-  image_color = load_image('images/chess1.png')
+  image_color = load_image('images/train/chess1.png')
   image_color = dilate(erode(image_color, iterations=1))
   selected_regions, regions = select_outer_figures(image_color.copy())
   figures += regions
   alphabet += [0, 1, 2, 3, 4, 2, 1, 0]
 
-  image_color = load_image('images/chess2.png')
+  image_color = load_image('images/train/chess2.png')
   image_color = dilate(erode(image_color, iterations=1))
   selected_regions, regions = select_outer_figures(image_color.copy())
   figures += regions
   alphabet += [5, 5]
 
-  image_color = load_image('images/chess3.png')
+  image_color = load_image('images/train/chess3.png')
   image_color = dilate(erode(image_color, iterations=1))
   selected_regions, regions = select_outer_figures(image_color.copy())
   figures += regions
   alphabet += [5, 5]
 
-  image_color = load_image('images/chess4.png')
+  image_color = load_image('images/train/chess4.png')
   image_color = dilate(erode(image_color, iterations=1))
   selected_regions, regions = select_outer_figures(image_color.copy())
   figures += regions
@@ -102,6 +79,33 @@ def create_alphabet():
 
   find_alpha = 0
   return figures, alphabet
+
+
+def network(train, regions):
+  figures, alphabet = create_alphabet()
+  if train == "train":
+    inputs = prepare_for_ann(figures)
+    outputs = convert_output(alphabet)
+    ann = create_ann()
+    ann = train_ann(ann, inputs, outputs)
+
+    model_json = ann.to_json()
+    with open("model.json", "w") as json_file:
+        json_file.write(model_json)
+    ann.save_weights("model.h5")
+    print("Saved model to disk")
+  if train == "no":
+    json_file = open('model.json', 'r')
+    loaded_model_json = json_file.read()
+    json_file.close()
+    ann = model_from_json(loaded_model_json)
+    ann.load_weights("model.h5")
+    print("Loaded model from disk")
+
+  input_regions = prepare_for_ann(regions)
+  result = ann.predict(np.array(input_regions[0:-1], np.float32))
+  # print(result)
+  print(display_result(result, alphabet))
 
 
 def scale_to_range(image):
@@ -153,7 +157,7 @@ def train_ann(ann, X_train, y_train):
     ann.compile(loss='mean_squared_error', optimizer=sgd)
 
     # obucavanje neuronske mreze
-    ann.fit(X_train, y_train, epochs=2000, batch_size=1, verbose = 0, shuffle=False) 
+    ann.fit(X_train, y_train, epochs=1000, batch_size=1, shuffle=False) 
       
     return ann
 
@@ -169,7 +173,7 @@ def display_result(outputs, alphabet):
     return result
 
 
-def rotate_chessboard(image):
+def rotate_chessboard(orig, image):
   lines = hough(image)
   # coskovi
   points = cross_points(lines, image)
@@ -191,18 +195,14 @@ def rotate_chessboard(image):
     alpha = (math.pi / 2 + alpha)
   center = (((point1[0] + point2[0]) / 2), ((point3[1] + point4[1]) / 2))
   M = cv2.getRotationMatrix2D(center, np.degrees(alpha), 1.0)
-  image = cv2.warpAffine(image, M, (image.shape[1], image.shape[0]))
+  orig = cv2.warpAffine(orig, M, (image.shape[1], image.shape[0]))
 
-  # remove black part
-  # image[np.where((image==[0, 0, 0]).all(axis=2))] = [255, 255, 255]
-  # image = erode(dilate(image))
   point1 = rotate(point1, alpha, center)
   point2 = rotate(point2, alpha, center)
   point3 = rotate(point3, alpha, center)
   point4 = rotate(point4, alpha, center)
-  # cv2.circle(image, (point1[0], point1[1]), 15, (0, 255, 255), -1)
-  image = crop_image(point1, point2, point3, point4, image)
-  return image
+  orig = crop_image(point1, point2, point3, point4, orig)
+  return orig
 
 
 def rotate_chessboard1(orig, image):
