@@ -5,46 +5,168 @@ import math
 import itertools
 import os
 import random
+import sys
+# keras
+from keras.models import Sequential
+from keras.layers.core import Dense,Activation
+from keras.optimizers import SGD
+from keras.models import model_from_json
 
 imgsize = 40
-photo = 1
+photo = 0
+find_alpha = 0
 
 
-def main():
+def main(train):
   # 71 68 54
   for filename in os.listdir('images'):
-    print filename
-    # if filename != "other":
-    if filename == "chess105.png":
+    # if filename != "other" and filename != "phone" and filename != "computer":
+    if filename == "chess65.png":
+      print filename
       if photo is 1:
         image_color = load_image('images/' + filename)
-        image_color = erode(dilate(image_color, 2), 2)
+        image_color = dilate(erode(image_color, 2), 2)
         img = image_bin(image_gray(image_color))
-        image_color = rotate_chessboard1(img)
+        image_color = rotate_chessboard1(image_color, img)
         selected_regions, regions = select_outer_figures(image_color.copy())
-        print(len(regions))
-        display_image(selected_regions)
+        # print(len(regions))
+        # display_image(selected_regions)
       else:
+        figures, alphabet = create_alphabet()
+        if train == "train":
+          inputs = prepare_for_ann(figures)
+          outputs = convert_output(alphabet)
+          ann = create_ann()
+          ann = train_ann(ann, inputs, outputs)
+
+          model_json = ann.to_json()
+          with open("model.json", "w") as json_file:
+              json_file.write(model_json)
+          ann.save_weights("model.h5")
+          print("Saved model to disk")
+
         image_color = load_image('images/' + filename)
         image_color = dilate(erode(image_color, iterations=1))
-        image_color = rotate_chessboard1(image_color)
+        image_color = rotate_chessboard1(image_color, image_color)
+        # display_image(image_color)
         selected_regions, regions = select_outer_figures(image_color.copy())
+        if train == "no":
+          json_file = open('model.json', 'r')
+          loaded_model_json = json_file.read()
+          json_file.close()
+          ann = model_from_json(loaded_model_json)
+          ann.load_weights("model.h5")
+          print("Loaded model from disk")
+
+        input_regions = prepare_for_ann(regions)
+        result = ann.predict(np.array(input_regions[0:-1], np.float32))
+        # print(result)
+        print(display_result(result, alphabet))
+
         # display_image(selected_regions)
-        print(len(regions))
+        # print(len(regions))
         # for region in regions:
         #   display_image(region)
 
 
-def change_contrast(img, level):
-  factor = (259 * (level + 255)) / (255 * (259 - level))
+# R = 0, H = 1, B = 2, Q = 3, K = 4, P = 5
+def create_alphabet():
+  global find_alpha
+  find_alpha = 1
+  figures = []
+  alphabet = []
 
-  def contrast(c):
-      return 128 + factor * (c - 128)
-  return img.point(contrast)
+  image_color = load_image('images/chess1.png')
+  image_color = dilate(erode(image_color, iterations=1))
+  selected_regions, regions = select_outer_figures(image_color.copy())
+  figures += regions
+  alphabet += [0, 1, 2, 3, 4, 2, 1, 0]
+
+  image_color = load_image('images/chess2.png')
+  image_color = dilate(erode(image_color, iterations=1))
+  selected_regions, regions = select_outer_figures(image_color.copy())
+  figures += regions
+  alphabet += [5, 5]
+
+  image_color = load_image('images/chess3.png')
+  image_color = dilate(erode(image_color, iterations=1))
+  selected_regions, regions = select_outer_figures(image_color.copy())
+  figures += regions
+  alphabet += [5, 5]
+
+  image_color = load_image('images/chess4.png')
+  image_color = dilate(erode(image_color, iterations=1))
+  selected_regions, regions = select_outer_figures(image_color.copy())
+  figures += regions
+  alphabet += [0, 1, 2, 3, 4, 2, 1, 0]
+
+  find_alpha = 0
+  return figures, alphabet
 
 
-def background(image):
-  return (image[15, 15] + image[15, image.shape[1] - 15] + image[image.shape[0] - 15, 15] + image[image.shape[0] - 15, image.shape[1] - 15]) / 4
+def scale_to_range(image):
+    ''' Elementi matrice image su vrednosti 0 ili 255. 
+        Potrebno je skalirati sve elemente matrica na opseg od 0 do 1
+    '''
+    return image / 255
+
+
+def matrix_to_vector(image):
+    '''Sliku koja je zapravo matrica 28x28 transformisati u vektor sa 784 elementa'''
+    return image.flatten()
+
+
+def prepare_for_ann(regions):
+    ready_for_ann = []
+    for region in regions:
+        # skalirati elemente regiona 
+        # region sa skaliranim elementima pretvoriti u vektor
+        # vektor dodati u listu spremnih regiona
+        scale = scale_to_range(region)
+        ready_for_ann.append(matrix_to_vector(scale))
+        
+    return ready_for_ann
+
+
+def convert_output(alphabet):
+    nn_outputs = []
+    for index in range(len(alphabet)):
+        output = np.zeros(len(alphabet))
+        output[index] = 1
+        nn_outputs.append(output)
+    return np.array(nn_outputs)
+
+
+def create_ann():
+    ann = Sequential()
+    ann.add(Dense(128, input_dim=1600, activation='sigmoid'))
+    ann.add(Dense(20, activation='sigmoid'))
+    return ann
+
+
+def train_ann(ann, X_train, y_train):
+    X_train = np.array(X_train, np.float32) # dati ulazi
+    y_train = np.array(y_train, np.float32) # zeljeni izlazi za date ulaze
+   
+    # definisanje parametra algoritma za obucavanje
+    sgd = SGD(lr=0.01, momentum=0.9)
+    ann.compile(loss='mean_squared_error', optimizer=sgd)
+
+    # obucavanje neuronske mreze
+    ann.fit(X_train, y_train, epochs=2000, batch_size=1, verbose = 0, shuffle=False) 
+      
+    return ann
+
+
+def winner(output):
+    return max(enumerate(output), key=lambda x: x[1])[0]
+
+
+def display_result(outputs, alphabet):
+    result = []
+    for output in outputs:
+        result.append(alphabet[winner(output)])
+    return result
 
 
 def rotate_chessboard(image):
@@ -83,7 +205,7 @@ def rotate_chessboard(image):
   return image
 
 
-def rotate_chessboard1(image):
+def rotate_chessboard1(orig, image):
   if photo is 1:
     img = canny_gray(image)
   else:
@@ -107,14 +229,14 @@ def rotate_chessboard1(image):
     alpha = (math.pi / 2 + alpha)
   center = (((point1[0] + point2[0]) / 2), ((point3[1] + point4[1]) / 2))
   M = cv2.getRotationMatrix2D(center, np.degrees(alpha), 1.0)
-  image = cv2.warpAffine(image, M, (image.shape[1], image.shape[0]))
+  orig = cv2.warpAffine(orig, M, (image.shape[1], image.shape[0]))
 
   point1 = rotate(point1, alpha, center)
   point2 = rotate(point2, alpha, center)
   point3 = rotate(point3, alpha, center)
   point4 = rotate(point4, alpha, center)
-  image = crop_image(point1, point2, point3, point4, image)
-  return image
+  orig = crop_image(point1, point2, point3, point4, orig)
+  return orig
 
 
 def crop_image(point1, point2, point3, point4, image):
@@ -175,7 +297,7 @@ def hough(image):
     y2 = int(y0 - 1500 * (a))
     lines.append(((x1, y1), (x2, y2)))
     cv2.line(image, (x1, y1), (x2, y2), (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)), 5)
-  display_image(image)
+  # display_image(image)
   return lines
 
 
@@ -202,12 +324,16 @@ def line_intersection(line1, line2, image):
 
 def select_outer_figures(image):
   if photo is 1:
-    img_bin = dilate(erode(image,2))
+    # img_bin = dilate(erode(image_bin(image),2))
+    image = cv2.medianBlur(image, 7)
+    image = cv2.medianBlur(image, 7)
+    img_bin = invert(dilate(erode(image_bin(image_gray(image)), 2)))
   else:
     img_bin = invert(dilate(erode(image_bin(image_gray(image)), 2)))
-  # img_bin = invert(image_bin(image_gray(image)))
+
+  # img_bin = invert(dilate(erode(image_bin(canny(image)))))
   # display_image(img_bin)
-  
+
   shape = image.shape
   field_len = int(shape[0] / 8)
 
@@ -220,13 +346,12 @@ def select_outer_figures(image):
     if hierarchy[3] == -1:  # izdvoji samo skroz spoljne konture
       x, y, w, h = cv2.boundingRect(contour)
       area = cv2.contourArea(contour)
-      if area > 100 and h < field_len and h > field_len / 2 and w > field_len / 3:
+      if (area > 100 and h < field_len and h > field_len / 2 and w > field_len / 3 and find_alpha == 0) or (area > 100 and h > field_len / 2 and w > field_len / 3 and find_alpha == 1):
         region = img_bin[y:y + h + 1, x:x + w + 1]
         regions_array.append([resize_region(region), (x, y, w, h)])
         cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
   regions_array = sorted(regions_array, key=lambda item: item[1][0])
   sorted_regions = [r[0] for r in regions_array]
-  # display_image(image)
   return image, sorted_regions
 
 
@@ -288,4 +413,7 @@ def erode(image, iterations=1):
 
 
 if __name__ == '__main__':
-  main()
+  if len(sys.argv) == 2:
+    main(sys.argv[1])
+  else:
+    print "train?"
