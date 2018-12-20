@@ -26,14 +26,14 @@ def main(train):
         image_color = load_image('images/' + filename)
         image_color = dilate(erode(image_color, 2), 2)
         img = image_bin(image_gray(image_color))
-        image_color = rotate_chessboard1(image_color, img)
+        image_color = find_chessboard(image_color, img)
         selected_regions, regions = find_figures(image_color.copy())
         # print(len(regions))
         # display_image(selected_regions)
       else:
         image_color = load_image('images/' + filename)
         image_color = dilate(erode(image_color, iterations=1))
-        image_color = rotate_chessboard1(image_color, image_color)
+        image_color = find_chessboard(image_color, image_color)
         # display_image(image_color)
         selected_regions, regions = find_figures(image_color.copy())
 
@@ -199,13 +199,13 @@ def display_result(outputs, alphabet):
 #   return orig
 
 
-def rotate_chessboard1(orig, image):
+def find_chessboard(orig, image):
   if photo is 1:
     img = canny_gray(image)
   else:
     img = canny(image)
 
-  box = find_board(image.copy(), img)
+  box = find_board_box(image.copy(), img)
 
   point1 = min(box, key=lambda(b): b[0])
   point2 = max(box, key=lambda(b): b[0])
@@ -372,7 +372,7 @@ def find_model_figures(image):
   return image, sorted_regions
 
 
-def find_board(image_orig, image_bin):
+def find_board_box(image_orig, image_bin):
   img, contours, hierarchy = cv2.findContours(image_bin, cv2.RETR_TREE, 2)
   for contour in contours:
     area = cv2.contourArea(contour)
