@@ -94,7 +94,12 @@ def network(train, regions):
   input_regions = prepare_for_ann(regions)
   result = ann.predict(np.array(input_regions[0:], np.float32))
   # print(result)
-  print(display_result(result, alphabet))
+
+  result_vector = display_result(result, alphabet)
+  # for idx, res in enumerate(result_vector):
+  #   print(res)
+  #   display_image(regions[idx])
+  print(result_vector)
 
 
 def read_model():
