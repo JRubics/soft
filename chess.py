@@ -6,6 +6,7 @@ import itertools
 import os
 import random
 import sys
+
 # keras
 from keras.models import Sequential
 from keras.layers.core import Dense
@@ -37,11 +38,48 @@ def main(train):
         # display_image(image_color)
         selected_regions, regions = find_figures(image_color.copy())
 
-        network(train, regions)
+        results = network(train, regions)
+        print results
 
         display_image(selected_regions)
-        # for region in regions:
-        #   display_image(region)
+        for idx, region in enumerate(regions):
+          print figure_data(results[idx], region)
+          display_image(region)
+
+
+def figure_data(result, region):
+  return find_color(region) + " " + figure_name(result)
+
+
+def find_color(image):
+  rows, cols = image.shape
+  b = 0
+  w = 0
+  for i in range(rows):
+    for j in range(cols):
+      if image[i, j] == 0:
+        b += 1
+      else:
+        w += 1
+  if b > w:
+    return "black"
+  else:
+    return "white"
+
+
+def figure_name(n):
+  if n == 0:
+    return "kralj"
+  elif n == 1:
+    return "konj"
+  elif n == 2:
+    return "lovac"
+  elif n == 3:
+    return "kraljica"
+  elif n == 4:
+    return "kralj"
+  elif n == 5:
+    return "pijun"
 
 
 # R = 0, H = 1, B = 2, Q = 3, K = 4, P = 5
@@ -99,7 +137,7 @@ def network(train, regions):
   # for idx, res in enumerate(result_vector):
   #   print(res)
   #   display_image(regions[idx])
-  print(result_vector)
+  return result_vector
 
 
 def read_model():
