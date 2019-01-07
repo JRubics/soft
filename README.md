@@ -4,6 +4,7 @@
 https://github.com/ftn-ai-lab/sc-2018-e2/issues/24
 
 ## potrebni paketi:
+python 2.7
 requirements.txt
 
 ## pokretanje:
