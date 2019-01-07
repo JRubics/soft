@@ -6,7 +6,6 @@ import itertools
 import os
 import random
 import sys
-
 # keras
 from keras.models import Sequential
 from keras.layers.core import Dense
@@ -18,33 +17,96 @@ photo = 0
 find_alpha = 0
 
 
-def main(train):
-  for filename in os.listdir('images'):
-    # if filename != "other" and filename != "phone" and filename != "computer" and filename != "train":
-    if filename == "chess65.png":
-      print filename
-      if photo is 1:
-        image_color = load_image('images/' + filename)
-        image_color = dilate(erode(image_color, 2), 2)
-        img = image_bin(image_gray(image_color))
-        image_color = find_chessboard(image_color, img)
-        selected_regions, regions = find_figures(image_color.copy())
-        # print(len(regions))
-        # display_image(selected_regions)
-      else:
-        image_color = load_image('images/' + filename)
-        image_color = dilate(erode(image_color, iterations=1))
-        image_color = find_chessboard(image_color, image_color)
-        # display_image(image_color)
-        selected_regions, regions = find_figures(image_color.copy())
+# 3, 6
+def main(train, filename):
+  if filename:
+    print filename
+    image_color = load_image('images/' + filename)
+    image_color = dilate(erode(image_color, iterations=1))
+    image_color = find_chessboard(image_color, image_color)
+    selected_regions, regions = find_figures(image_color.copy())
+    results = network(train, regions)
+    output(results, selected_regions, regions)
+  else:
+    for filename in os.listdir('images'):
+      if filename != "other" and filename != "phone" and filename != "computer" and filename != "train" and filename != "screenshot":
+      # if filename == "chess2.png":
+        print filename
+        if photo is 1:
+          image_color = load_image('images/' + filename)
+          image_color = dilate(erode(image_color, 2), 2)
+          img = image_bin(image_gray(image_color))
+          image_color = find_chessboard(image_color, img)
+          selected_regions, regions = find_figures(image_color.copy())
+        else:
+          image_color = load_image('images/' + filename)
+          image_color = dilate(erode(image_color, iterations=1))
+          image_color = find_chessboard(image_color, image_color)
+          selected_regions, regions = find_figures(image_color.copy())
 
         results = network(train, regions)
-        print results
+        output(results, selected_regions, regions)
 
-        display_image(selected_regions)
-        for idx, region in enumerate(regions):
-          print figure_data(results[idx], region)
-          display_image(region)
+
+def output(results, selected_regions, regions):
+  black = {}
+  white = {}
+  for idx, region in enumerate(regions):
+    if find_color(region) is "crni":
+      if figure_name(results[idx]) in black.keys():
+        black[figure_name(results[idx])] = black[figure_name(results[idx])] + 1
+      else:
+        black[figure_name(results[idx])] = 1
+    else:
+      if figure_name(results[idx]) in white.keys():
+        white[figure_name(results[idx])] = white[figure_name(results[idx])] + 1
+      else:
+        white[figure_name(results[idx])] = 1
+  print "crni"
+  print black
+  print "beli"
+  print white
+  chess_winner(black, white)
+  display_image(selected_regions)
+
+
+def chess_winner(black, white):
+  black_pawn = black["pijun"] if "pijun" in black.keys() else 0
+  white_pawn = white["pijun"] if "pijun" in white.keys() else 0
+  black_queen = black["kraljica"] if "kraljica" in black.keys() else 0
+  black_rook = black["top"] if "top" in black.keys() else 0
+  white_queen = white["kraljica"] if "kraljica" in white.keys() else 0
+  white_rook = white["top"] if "top" in white.keys() else 0
+  black_knight = black["konj"] if "konj" in black.keys() else 0
+  black_bishop = black["lovac"] if "lovac" in black.keys() else 0
+  white_knight = white["konj"] if "konj" in white.keys() else 0
+  white_bishop = white["lovac"] if "lovac" in white.keys() else 0
+
+  black_major = black_queen + black_rook
+  black_minor = black_knight + black_bishop
+
+  white_major = white_queen + white_rook
+  white_minor = white_knight + white_bishop
+
+  print "CRNI: kralj(1), major(" + str(black_major) + "), minor(" + str(black_minor) + "), pijuni(" + str(black_pawn) + ")"
+  print "BELI: kralj(1), major(" + str(white_major) + "), minor(" + str(white_minor) + "), pijuni(" + str(white_pawn) + ")"
+  if black_pawn + black_major + black_minor > white_pawn + white_major + white_minor:
+    print "CRNI ima vise figura"
+  elif black_pawn + black_major + black_minor < white_pawn + white_major + white_minor:
+    print "BELI ima vise figura"
+  else:
+    print "JEDNAK BROJ FIGURA"
+    if black_major > white_major:
+      print "CRNI ima bolje figure"
+    elif black_major < white_major:
+      print "BELI ima bolje figure"
+    else:
+      if black_minor > white_minor:
+        print "CRNI ima bolje figure"
+      elif black_minor < white_minor:
+        print "BELI ima bolje figure"
+      else:
+        print "SVE FIGURE SU ISTE"
 
 
 def figure_data(result, region):
@@ -58,18 +120,18 @@ def find_color(image):
   for i in range(rows):
     for j in range(cols):
       if image[i, j] == 0:
-        b += 1
-      else:
         w += 1
+      else:
+        b += 1
   if b > w:
-    return "black"
+    return "crni"
   else:
-    return "white"
+    return "beli"
 
 
 def figure_name(n):
   if n == 0:
-    return "kralj"
+    return "top"
   elif n == 1:
     return "konj"
   elif n == 2:
@@ -131,12 +193,8 @@ def network(train, regions):
 
   input_regions = prepare_for_ann(regions)
   result = ann.predict(np.array(input_regions[0:], np.float32))
-  # print(result)
 
   result_vector = display_result(result, alphabet)
-  # for idx, res in enumerate(result_vector):
-  #   print(res)
-  #   display_image(regions[idx])
   return result_vector
 
 
@@ -213,35 +271,6 @@ def display_result(outputs, alphabet):
   return result
 
 
-# def rotate_chessboard(orig, image):
-#   lines = hough(image)
-#   # coskovi
-#   points = cross_points(lines, image)
-#   points.sort(key=lambda x: x[0])
-#   point1 = points[0]
-#   point2 = points[len(points) - 1]
-#   points.sort(key=lambda y: y[1])
-#   point3 = points[0]
-#   point4 = points[len(points) - 1]
-#   # cv2.circle(image, (point1[0], point1[1]), 15, (0, 255, 255), -1)
-
-#   x = abs(point1[0] - point3[0])
-#   y = abs(point1[1] - point3[1])
-#   alpha = -np.arctan2(y, x)
-#   if y > x:
-#     alpha = (math.pi / 2 + alpha)
-#   center = (((point1[0] + point2[0]) / 2), ((point3[1] + point4[1]) / 2))
-#   M = cv2.getRotationMatrix2D(center, np.degrees(alpha), 1.0)
-#   orig = cv2.warpAffine(orig, M, (image.shape[1], image.shape[0]))
-
-#   point1 = rotate(point1, alpha, center)
-#   point2 = rotate(point2, alpha, center)
-#   point3 = rotate(point3, alpha, center)
-#   point4 = rotate(point4, alpha, center)
-#   orig = crop_image(point1, point2, point3, point4, orig)
-#   return orig
-
-
 def find_chessboard(orig, image):
   if photo is 1:
     img = canny_gray(image)
@@ -299,16 +328,6 @@ def rotate(point, alpha, center):
   return (int(x), int(y))
 
 
-def cross_points(lines, image):
-  points = []
-  for line1, line2 in itertools.combinations(lines, 2):
-    if line_intersection(line1, line2, image):
-      points.append(line_intersection(line1, line2, image))
-  # for point in points:
-  #   cv2.circle(image, (point[0], point[1]), 5, (255, 0, 255), -1)
-  return points
-
-
 def canny(image):
   gray = image_gray(image)
   edges = cv2.Canny(gray, 100, 300, apertureSize=7)
@@ -338,29 +357,7 @@ def hough(image):
     y2 = int(y0 - 1500 * (a))
     lines.append(((x1, y1), (x2, y2)))
     cv2.line(image, (x1, y1), (x2, y2), (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)), 5)
-  # display_image(image)
   return lines
-
-
-# preuzeto sa stackoverflow-a
-def line_intersection(line1, line2, image):
-  xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0])
-  ydiff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1])
-
-  def det(a, b):
-      return a[0] * b[1] - a[1] * b[0]
-
-  div = det(xdiff, ydiff)
-  if div == 0:
-    return None
-
-  d = (det(*line1), det(*line2))
-  x = det(d, xdiff) / div
-  y = det(d, ydiff) / div
-  if(x > 0 and x < image.shape[1] and y > 0 and y < image.shape[0]):
-    return x, y
-  else:
-    return None
 
 
 def find_figures(image):
@@ -473,6 +470,8 @@ def erode(image, iterations=1):
 
 if __name__ == '__main__':
   if len(sys.argv) == 2:
-    main(sys.argv[1])
+    main(sys.argv[1], None)
+  elif len(sys.argv) == 3:
+    main(sys.argv[1], sys.argv[2])
   else:
     print "train?"
