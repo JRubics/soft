@@ -8,9 +8,14 @@ requirements.txt
 
 ## pokretanje:
 python chess.py flag1 flag2
+
 flag1 - no - ako se koristi unapred trenirana mreža
+
      - train - ako se trenira mreža
+     
 flag2 - naziv slike koja se nalazi u images folderu
+
      - ako se ne stavi onda pokreće za sve slike
      
-## primer: python chess.py no chess2.png
+## primer: 
+python chess.py no chess2.png
