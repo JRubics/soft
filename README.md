@@ -10,7 +10,6 @@ requirements.txt
 python chess.py flag1 flag2
 
 flag1 - no - ako se koristi unapred trenirana mreža
-
      - train - ako se trenira mreža
      
 flag2 - naziv slike koja se nalazi u images folderu
