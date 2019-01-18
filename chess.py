@@ -25,8 +25,9 @@ def main(train, filename):
     image_color = dilate(erode(image_color, iterations=1))
     image_color = find_chessboard(image_color, image_color)
     selected_regions, regions = find_figures(image_color.copy())
-    results = network(train, regions)
-    output(results, selected_regions, regions)
+    display_image(selected_regions)
+    # results = network(train, regions)
+    # output(results, selected_regions, regions)
   else:
     for filename in os.listdir('images'):
       if filename != "other" and filename != "phone" and filename != "computer" and filename != "train" and filename != "screenshot":
