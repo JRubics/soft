@@ -45,13 +45,13 @@ def create_alphabet():
   return figures, alphabet
 
 
-def network(train, regions):
+def network(train, regions, epochs):
   figures, alphabet = create_alphabet()
   if train == "train":
     inputs = prepare_for_ann(figures)
     outputs = convert_output(alphabet)
     ann = create_ann()
-    ann = train_ann(ann, inputs, outputs)
+    ann = train_ann(ann, inputs, outputs, epochs)
 
     save_model(ann)
   if train == "no":
@@ -115,14 +115,14 @@ def create_ann():
   return ann
 
 
-def train_ann(ann, input_train, output_train):
+def train_ann(ann, input_train, output_train, epochs=150):
     input_train = np.array(input_train, np.float32)
     output_train = np.array(output_train, np.float32)
 
     sgd = SGD(lr=0.01, momentum=0.9)
     ann.compile(loss='mean_squared_error', optimizer=sgd)
 
-    ann.fit(input_train, output_train, epochs=150, batch_size=1, shuffle=False) 
+    ann.fit(input_train, output_train, epochs=epochs, batch_size=1, shuffle=False) 
     return ann
 
 
