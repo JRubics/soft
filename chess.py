@@ -13,6 +13,7 @@ from keras.optimizers import SGD
 from keras.models import model_from_json
 
 imgsize = 40
+debug = 0
 find_alpha = 0
 
 
@@ -29,12 +30,12 @@ def main(train, filename):
     output(results, selected_regions, regions)
   else:
     for filename in os.listdir('images'):
-      if filename != "other" and filename != "phone" and filename != "computer" and filename != "train" and filename != "screenshot":
+      print(filename)
+      if filename != "other" and filename != "phone" and filename != "computer" and filename != "train" and filename != "screenshot" and filename != "main" and filename != "old":
       # if filename == "wood1.png":
         image_color = load_image('images/' + filename)
         display_image(image_color)
         image_color = dilate(erode(image_color, iterations=1))
-        # display_image(image_color)
         image_color = find_chessboard(image_color, image_color)
         selected_regions, regions = find_figures(image_color.copy())
 
@@ -267,30 +268,10 @@ def display_result(outputs, alphabet):
 
 def find_chessboard(orig, image):
   img = canny(image)
-  display_image(img)
-
+  if debug:
+    display_image(img)
   img = erode(dilate(img, 2), 2)
-  # display_image(img)
-  box = find_board_box(image.copy(), img)
-
-  point1 = min(box, key=lambda(b): b[0])
-  point2 = max(box, key=lambda(b): b[0])
-  point3 = min(box, key=lambda(b): b[1])
-  point4 = max(box, key=lambda(b): b[1])
-  # cv2.circle(image, (point1[0], point1[1]), 5, (255, 0, 255), -1)
-  # cv2.circle(image, (point2[0], point2[1]), 5, (255, 0, 255), -1)
-  # cv2.circle(image, (point3[0], point3[1]), 5, (255, 0, 255), -1)
-  # cv2.circle(image, (point4[0], point4[1]), 5, (255, 0, 255), -1)
-  # display_image(image)
-  orig, alpha, center = rotate_image(point1, point2, point3, point4, orig)
-
-  point1 = rotate(point1, alpha, center)
-  point2 = rotate(point2, alpha, center)
-  point3 = rotate(point3, alpha, center)
-  point4 = rotate(point4, alpha, center)
-
-  orig = crop_image(point1, point2, point3, point4, orig)
-
+  orig = find_board_box(image.copy(), img)
   return orig
 
 
@@ -359,11 +340,18 @@ def hough(image):
 
 def find_figures(image):
   img_bin = invert(dilate(erode(image_bin(image_gray(image)), 2)))
+  if debug:
+    display_image(img_bin)
 
   shape = image.shape
   field_len = int(shape[0] / 8)
 
   img, contours, hierarchy = cv2.findContours(img_bin.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+  cpy = image.copy()
+  cpy = cv2.drawContours(cpy, contours, -1, (0, 255, 0), 3)
+  if debug:
+    display_image(cpy)
+
   regions_array = []
   hierarchy = hierarchy[0]
   for component in zip(contours, hierarchy):
@@ -404,16 +392,57 @@ def find_model_figures(image):
   return image, sorted_regions
 
 
+def perspective_fix(image, contours):
+  for c in contours:
+    peri = cv2.arcLength(c, True)
+    approx = cv2.approxPolyDP(c, 0.015 * peri, True)
+    if len(approx) == 4:
+      contour = approx
+      break
+
+  pts = contour.reshape(4, 2)
+  rect = np.zeros((4, 2), dtype="float32")
+  s = pts.sum(axis=1)
+  rect[0] = pts[np.argmin(s)]
+  rect[2] = pts[np.argmax(s)]
+  diff = np.diff(pts, axis=1)
+  rect[1] = pts[np.argmin(diff)]
+  rect[3] = pts[np.argmax(diff)]
+
+  (tl, tr, br, bl) = rect
+  widthA = np.sqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))
+  widthB = np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
+  heightA = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
+  heightB = np.sqrt(((tl[0] - bl[0]) ** 2) + ((tl[1] - bl[1]) ** 2))
+  maxWidth = max(int(widthA), int(widthB))
+  maxHeight = max(int(heightA), int(heightB))
+
+  dst = np.array([[0, 0], [maxWidth - 1, 0], [maxWidth - 1, maxHeight - 1], [0, maxHeight - 1]], dtype="float32")
+
+  M = cv2.getPerspectiveTransform(rect, dst)
+  warp = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
+  height, width, channels = warp.shape
+  warp = warp[4:height - 4, 4:width - 4]
+  if debug:
+    display_image(warp)
+  return warp
+
+
 def find_board_box(image_orig, image_bin):
-  img, contours, hierarchy = cv2.findContours(image_bin, cv2.RETR_TREE, 2)
-  for contour in contours:
-    area = cv2.contourArea(contour)
-    if area < 50000:
-      continue
-    rect = cv2.minAreaRect(contour)
-    box = cv2.boxPoints(rect)
-    box = np.int0(box)
-    return box
+  img, contours, hierarchy = cv2.findContours(image_bin, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+  # contours = imutils.grab_contours(contours)
+  contours = sorted(contours, key=cv2.contourArea, reverse=True)[:10]
+  return perspective_fix(image_orig, contours)
+
+  # for contour in contours:
+  #   area = cv2.contourArea(contour)
+  #   if area < 50000:
+  #     continue
+  #   perspective_fix(image_orig, contour)
+  #   rect = cv2.minAreaRect(contour)
+  #   box = cv2.boxPoints(rect)
+  #   box = np.int0(box)
+  #   return box
 
 
 def resize_region(region):
@@ -431,7 +460,7 @@ def image_gray(image):
 
 def image_bin(image_gs):
   height, width = image_gs.shape[0:2]
-  ret, image_bin = cv2.threshold(image_gs, 120, 255, cv2.THRESH_BINARY)
+  ret, image_bin = cv2.threshold(image_gs, 110, 255, cv2.THRESH_BINARY)
   return image_bin
 
 
