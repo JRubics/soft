@@ -30,13 +30,12 @@ def main(train, filename):
   else:
     for filename in os.listdir('images'):
       print(filename)
-      if filename != "other" and filename != "phone" and filename != "computer" and filename != "train" and filename != "screenshot" and filename != "main" and filename != "old":
+      if filename != "train" and filename != "main":
         image_color = load_image('images/' + filename)
         display_image(image_color)
         image_color = dilate(erode(image_color, iterations=1))
         image_color = find_chessboard(image_color, image_color)
         selected_regions, regions = find_figures(image_color.copy())
-
         results = network(train, regions)
         output(results, selected_regions, regions)
         print("--------------------------------------------")
