@@ -13,7 +13,6 @@ from keras.optimizers import SGD
 from keras.models import model_from_json
 
 imgsize = 40
-photo = 0
 find_alpha = 0
 
 
@@ -22,28 +21,22 @@ def main(train, filename):
   if filename:
     print filename
     image_color = load_image('images/' + filename)
+    display_image(image_color)
     image_color = dilate(erode(image_color, iterations=1))
     image_color = find_chessboard(image_color, image_color)
     selected_regions, regions = find_figures(image_color.copy())
-    display_image(selected_regions)
-    # results = network(train, regions)
-    # output(results, selected_regions, regions)
+    results = network(train, regions)
+    output(results, selected_regions, regions)
   else:
     for filename in os.listdir('images'):
       if filename != "other" and filename != "phone" and filename != "computer" and filename != "train" and filename != "screenshot":
-      # if filename == "chess2.png":
-        print filename
-        if photo is 1:
-          image_color = load_image('images/' + filename)
-          image_color = dilate(erode(image_color, 2), 2)
-          img = image_bin(image_gray(image_color))
-          image_color = find_chessboard(image_color, img)
-          selected_regions, regions = find_figures(image_color.copy())
-        else:
-          image_color = load_image('images/' + filename)
-          image_color = dilate(erode(image_color, iterations=1))
-          image_color = find_chessboard(image_color, image_color)
-          selected_regions, regions = find_figures(image_color.copy())
+      # if filename == "wood1.png":
+        image_color = load_image('images/' + filename)
+        display_image(image_color)
+        image_color = dilate(erode(image_color, iterations=1))
+        # display_image(image_color)
+        image_color = find_chessboard(image_color, image_color)
+        selected_regions, regions = find_figures(image_color.copy())
 
         results = network(train, regions)
         output(results, selected_regions, regions)
@@ -273,11 +266,11 @@ def display_result(outputs, alphabet):
 
 
 def find_chessboard(orig, image):
-  if photo is 1:
-    img = canny_gray(image)
-  else:
-    img = canny(image)
+  img = canny(image)
+  display_image(img)
 
+  img = erode(dilate(img, 2), 2)
+  # display_image(img)
   box = find_board_box(image.copy(), img)
 
   point1 = min(box, key=lambda(b): b[0])
@@ -285,7 +278,10 @@ def find_chessboard(orig, image):
   point3 = min(box, key=lambda(b): b[1])
   point4 = max(box, key=lambda(b): b[1])
   # cv2.circle(image, (point1[0], point1[1]), 5, (255, 0, 255), -1)
-
+  # cv2.circle(image, (point2[0], point2[1]), 5, (255, 0, 255), -1)
+  # cv2.circle(image, (point3[0], point3[1]), 5, (255, 0, 255), -1)
+  # cv2.circle(image, (point4[0], point4[1]), 5, (255, 0, 255), -1)
+  # display_image(image)
   orig, alpha, center = rotate_image(point1, point2, point3, point4, orig)
 
   point1 = rotate(point1, alpha, center)
@@ -329,9 +325,9 @@ def rotate(point, alpha, center):
   return (int(x), int(y))
 
 
-def canny(image):
+def canny(image, threshold1=100, threshold2=300, apertureSize=3):
   gray = image_gray(image)
-  edges = cv2.Canny(gray, 100, 300, apertureSize=7)
+  edges = cv2.Canny(gray, threshold1, threshold2, apertureSize=apertureSize)
   return dilate(edges)
 
 
@@ -362,12 +358,7 @@ def hough(image):
 
 
 def find_figures(image):
-  if photo is 1:
-    image = cv2.medianBlur(image, 7)
-    image = cv2.medianBlur(image, 7)
-    img_bin = invert(dilate(erode(image_bin(image_gray(image)), 2)))
-  else:
-    img_bin = invert(dilate(erode(image_bin(image_gray(image)), 2)))
+  img_bin = invert(dilate(erode(image_bin(image_gray(image)), 2)))
 
   shape = image.shape
   field_len = int(shape[0] / 8)
@@ -440,10 +431,7 @@ def image_gray(image):
 
 def image_bin(image_gs):
   height, width = image_gs.shape[0:2]
-  if photo is 1:
-    image_bin = cv2.adaptiveThreshold(image_gs, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
-  else:
-    ret, image_bin = cv2.threshold(image_gs, 120, 255, cv2.THRESH_BINARY)
+  ret, image_bin = cv2.threshold(image_gs, 120, 255, cv2.THRESH_BINARY)
   return image_bin
 
 
