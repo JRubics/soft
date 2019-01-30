@@ -1,4 +1,2 @@
-images/computer
-images/screenshot
-images/phone
-images/other
+images/main
+*.pyc
