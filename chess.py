@@ -17,7 +17,6 @@ debug = 0
 find_alpha = 0
 
 
-# 3, 6
 def main(train, filename):
   if filename:
     print filename
@@ -32,7 +31,6 @@ def main(train, filename):
     for filename in os.listdir('images'):
       print(filename)
       if filename != "other" and filename != "phone" and filename != "computer" and filename != "train" and filename != "screenshot" and filename != "main" and filename != "old":
-      # if filename == "wood1.png":
         image_color = load_image('images/' + filename)
         display_image(image_color)
         image_color = dilate(erode(image_color, iterations=1))
@@ -41,6 +39,7 @@ def main(train, filename):
 
         results = network(train, regions)
         output(results, selected_regions, regions)
+        print("--------------------------------------------")
 
 
 def output(results, selected_regions, regions):
@@ -275,67 +274,10 @@ def find_chessboard(orig, image):
   return orig
 
 
-def rotate_image(point1, point2, point3, point4, image):
-  x = abs(point1[0] - point3[0])
-  y = abs(point1[1] - point3[1])
-  alpha = -np.arctan2(y, x)
-  if y > x:
-    alpha = (math.pi / 2 + alpha)
-  center = (((point1[0] + point2[0]) / 2), ((point3[1] + point4[1]) / 2))
-  M = cv2.getRotationMatrix2D(center, np.degrees(alpha), 1.0)
-  image = cv2.warpAffine(image, M, (image.shape[1], image.shape[0]))
-  return image, alpha, center
-
-
-def crop_image(point1, point2, point3, point4, image):
-  x_min = min(point1[0], point2[0], point3[0], point4[0]) + 3
-  x_max = max(point1[0], point2[0], point3[0], point4[0]) - 3
-  y_min = min(point1[1], point2[1], point3[1], point4[1]) + 3
-  y_max = max(point1[1], point2[1], point3[1], point4[1]) - 3
-  image = image[y_min:y_max, x_min:x_max]  # obrnute coord -.-'
-  return image
-
-
-def rotate(point, alpha, center):
-  cos = np.cos(alpha)
-  sin = np.sin(alpha)
-  x = (point[1] - center[1]) * cos - (point[0] - center[0]) * sin
-  y = (point[1] - center[1]) * sin + (point[0] - center[0]) * cos
-  x = x + center[0]
-  y = y + center[1]
-  return (int(x), int(y))
-
-
 def canny(image, threshold1=100, threshold2=300, apertureSize=3):
   gray = image_gray(image)
   edges = cv2.Canny(gray, threshold1, threshold2, apertureSize=apertureSize)
   return dilate(edges)
-
-
-def canny_gray(image):
-  edges = cv2.Canny(image, 100, 300, apertureSize=7)
-  return dilate(edges)
-
-
-def hough(image):
-  edges = canny(image)
-  hough = cv2.HoughLines(edges, 1, np.pi / 180, 150)
-  lines = []
-
-  for h in hough:
-    rho = h[0][0]
-    theta = h[0][1]
-    a = np.cos(theta)
-    b = np.sin(theta)
-    x0 = a * rho
-    y0 = b * rho
-    x1 = int(x0 + 1500 * (-b))
-    y1 = int(y0 + 1500 * (a))
-    x2 = int(x0 - 1500 * (-b))
-    y2 = int(y0 - 1500 * (a))
-    lines.append(((x1, y1), (x2, y2)))
-    cv2.line(image, (x1, y1), (x2, y2), (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)), 5)
-  return lines
 
 
 def find_figures(image):
@@ -347,9 +289,9 @@ def find_figures(image):
   field_len = int(shape[0] / 8)
 
   img, contours, hierarchy = cv2.findContours(img_bin.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-  cpy = image.copy()
-  cpy = cv2.drawContours(cpy, contours, -1, (0, 255, 0), 3)
   if debug:
+    cpy = image.copy()
+    cpy = cv2.drawContours(cpy, contours, -1, (0, 255, 0), 3)
     display_image(cpy)
 
   regions_array = []
@@ -430,19 +372,8 @@ def perspective_fix(image, contours):
 
 def find_board_box(image_orig, image_bin):
   img, contours, hierarchy = cv2.findContours(image_bin, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-  # contours = imutils.grab_contours(contours)
   contours = sorted(contours, key=cv2.contourArea, reverse=True)[:10]
   return perspective_fix(image_orig, contours)
-
-  # for contour in contours:
-  #   area = cv2.contourArea(contour)
-  #   if area < 50000:
-  #     continue
-  #   perspective_fix(image_orig, contour)
-  #   rect = cv2.minAreaRect(contour)
-  #   box = cv2.boxPoints(rect)
-  #   box = np.int0(box)
-  #   return box
 
 
 def resize_region(region):
