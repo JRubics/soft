@@ -115,14 +115,14 @@ def create_ann():
   return ann
 
 
-def train_ann(ann, input_train, output_train, epochs=150):
+def train_ann(ann, input_train, output_train, epochs=130):
     input_train = np.array(input_train, np.float32)
     output_train = np.array(output_train, np.float32)
 
     sgd = SGD(lr=0.01, momentum=0.9)
     ann.compile(loss='mean_squared_error', optimizer=sgd)
 
-    ann.fit(input_train, output_train, epochs=epochs, batch_size=1, shuffle=False) 
+    ann.fit(input_train, output_train, epochs=epochs, batch_size=1, shuffle=False)
     return ann
 
 

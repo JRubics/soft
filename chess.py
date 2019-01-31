@@ -5,7 +5,7 @@ from chessboard_func import *
 from result_func import *
 
 
-def chess(train, filename, epochs):
+def chess(train, filename, epochs=130):
   if filename:
     print filename
     image_color = load_image('images/' + filename)

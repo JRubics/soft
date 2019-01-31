@@ -1,0 +1,374 @@
+10
+chess1.png
+Saved model to disk
+crni
+{'pijun': 14, 'kraljica': 2}
+beli
+{'pijun': 7, 'top': 3, 'lovac': 4, 'kraljica': 2}
+CRNI: kralj(1), major(2), minor(0), pijuni(14)
+BELI: kralj(1), major(5), minor(4), pijuni(7)
+JEDNAK BROJ FIGURA
+BELI ima bolje figure
+
+
+20
+chess1.png
+Saved model to disk
+crni
+{'pijun': 5, 'konj': 3, 'kralj': 1, 'lovac': 1, 'kraljica': 6}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(6), minor(4), pijuni(5)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+JEDNAK BROJ FIGURA
+CRNI ima bolje figure
+
+
+30
+chess1.png
+Saved model to disk
+crni
+{'pijun': 9, 'konj': 7}
+beli
+{'konj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 3}
+CRNI: kralj(1), major(0), minor(7), pijuni(9)
+BELI: kralj(1), major(5), minor(3), pijuni(8)
+JEDNAK BROJ FIGURA
+BELI ima bolje figure
+
+
+40
+chess1.png
+Saved model to disk
+crni
+{'pijun': 10, 'konj': 4, 'kralj': 1, 'lovac': 1}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(0), minor(5), pijuni(10)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+JEDNAK BROJ FIGURA
+BELI ima bolje figure
+
+
+50
+chess1.png
+Saved model to disk
+crni
+{'pijun': 8, 'lovac': 2, 'kralj': 2, 'kraljica': 4}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(4), minor(2), pijuni(8)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+BELI ima vise figura
+
+
+60
+chess1.png
+Saved model to disk
+crni
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(3), minor(4), pijuni(8)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+JEDNAK BROJ FIGURA
+SVE FIGURE SU ISTE
+
+
+70
+chess1.png
+Saved model to disk
+crni
+{'pijun': 5, 'konj': 8, 'lovac': 3}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(0), minor(11), pijuni(5)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+CRNI ima vise figura
+
+
+80
+chess1.png
+Saved model to disk
+crni
+{'pijun': 9, 'top': 3, 'kralj': 1, 'konj': 2, 'kraljica': 1}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(4), minor(2), pijuni(9)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+JEDNAK BROJ FIGURA
+CRNI ima bolje figure
+
+
+90
+chess1.png
+Saved model to disk
+crni
+{'pijun': 8, 'top': 2, 'kralj': 3, 'lovac': 2, 'kraljica': 1}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(3), minor(2), pijuni(8)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+BELI ima vise figura
+
+
+100
+chess1.png
+Saved model to disk
+crni
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(3), minor(4), pijuni(8)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+JEDNAK BROJ FIGURA
+SVE FIGURE SU ISTE
+
+
+110
+chess1.png
+Saved model to disk
+crni
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(3), minor(4), pijuni(8)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+JEDNAK BROJ FIGURA
+SVE FIGURE SU ISTE
+
+
+120
+chess1.png
+Saved model to disk
+crni
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(3), minor(4), pijuni(8)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+JEDNAK BROJ FIGURA
+SVE FIGURE SU ISTE
+
+
+130
+chess1.png
+Saved model to disk
+crni
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(3), minor(4), pijuni(8)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+JEDNAK BROJ FIGURA
+SVE FIGURE SU ISTE
+
+
+140
+chess1.png
+Saved model to disk
+crni
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(3), minor(4), pijuni(8)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+JEDNAK BROJ FIGURA
+SVE FIGURE SU ISTE
+
+
+150
+chess1.png
+Saved model to disk
+crni
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(3), minor(4), pijuni(8)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+JEDNAK BROJ FIGURA
+SVE FIGURE SU ISTE
+
+
+160
+chess1.png
+Saved model to disk
+crni
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(3), minor(4), pijuni(8)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+JEDNAK BROJ FIGURA
+SVE FIGURE SU ISTE
+
+
+170
+chess1.png
+Saved model to disk
+crni
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(3), minor(4), pijuni(8)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+JEDNAK BROJ FIGURA
+SVE FIGURE SU ISTE
+
+
+180
+chess1.png
+Saved model to disk
+crni
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(3), minor(4), pijuni(8)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+JEDNAK BROJ FIGURA
+SVE FIGURE SU ISTE
+
+
+190
+chess1.png
+Saved model to disk
+crni
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(3), minor(4), pijuni(8)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+JEDNAK BROJ FIGURA
+SVE FIGURE SU ISTE
+
+
+200
+chess1.png
+Saved model to disk
+crni
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(3), minor(4), pijuni(8)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+JEDNAK BROJ FIGURA
+SVE FIGURE SU ISTE
+
+
+210
+chess1.png
+Saved model to disk
+crni
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(3), minor(4), pijuni(8)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+JEDNAK BROJ FIGURA
+SVE FIGURE SU ISTE
+
+
+220
+chess1.png
+Saved model to disk
+crni
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(3), minor(4), pijuni(8)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+JEDNAK BROJ FIGURA
+SVE FIGURE SU ISTE
+
+
+230
+chess1.png
+Saved model to disk
+crni
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(3), minor(4), pijuni(8)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+JEDNAK BROJ FIGURA
+SVE FIGURE SU ISTE
+
+
+240
+chess1.png
+Saved model to disk
+crni
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(3), minor(4), pijuni(8)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+JEDNAK BROJ FIGURA
+SVE FIGURE SU ISTE
+
+
+250
+chess1.png
+Saved model to disk
+crni
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(3), minor(4), pijuni(8)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+JEDNAK BROJ FIGURA
+SVE FIGURE SU ISTE
+
+
+260
+chess1.png
+Saved model to disk
+crni
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(3), minor(4), pijuni(8)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+JEDNAK BROJ FIGURA
+SVE FIGURE SU ISTE
+
+
+270
+chess1.png
+Saved model to disk
+crni
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(3), minor(4), pijuni(8)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+JEDNAK BROJ FIGURA
+SVE FIGURE SU ISTE
+
+
+280
+chess1.png
+Saved model to disk
+crni
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(3), minor(4), pijuni(8)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+JEDNAK BROJ FIGURA
+SVE FIGURE SU ISTE
+
+
+290
+chess1.png
+Saved model to disk
+crni
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+beli
+{'konj': 2, 'kralj': 1, 'pijun': 8, 'top': 2, 'lovac': 2, 'kraljica': 1}
+CRNI: kralj(1), major(3), minor(4), pijuni(8)
+BELI: kralj(1), major(3), minor(4), pijuni(8)
+JEDNAK BROJ FIGURA
+SVE FIGURE SU ISTE
+
+
