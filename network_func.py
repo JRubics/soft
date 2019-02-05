@@ -54,9 +54,11 @@ def network(train, regions, epochs):
     ann = train_ann(ann, inputs, outputs, epochs)
 
     save_model(ann)
-  if train == "no":
+  elif train == "no":
     ann = read_model()
-
+  else:
+    print("train/no?")
+    exit()
   input_regions = prepare_for_ann(regions)
   result = ann.predict(np.array(input_regions[0:], np.float32))
 
